@@ -1,0 +1,9 @@
+---
+- hosts: 127.0.0.1
+
+  vars:
+    pgdata: /var/lib/pgsql9/data
+
+  tasks:
+  - name: Install PostgreSQL 9
+    action: yum name=postgresql9-server
