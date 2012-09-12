@@ -7,3 +7,22 @@
   tasks:
   - name: Install PostgreSQL 9
     action: yum name=postgresql9-server
+
+  - name: Remove existing pgsql9 data dir, need to re-run PostgreSQL init script
+    action: file path=$pgdata state=absent
+
+  - name: Initialise PostgreSQL 
+    action: command service postgresql initdb
+
+  - name: Listen on remote addresses
+    action: command sed -i.bak "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" $pgdata/postgresql.conf
+
+  - name: Allow remote TCP connection using username/password
+    action: sed -r -i.bak "s/host +all +all +127.0.0.1\/32 +ident/host all all 0.0.0.0\/0 md5/g" $pgdata/pg_hba.conf
+
+
+  
+  # action: sudo service postgresql start
+  # psql -c "CREATE ROLE dave WITH LOGIN PASSWORD 'password';"
+  # psql create database
+  
