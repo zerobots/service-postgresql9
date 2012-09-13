@@ -1,7 +1,7 @@
 How to setup PostgreSQL 9
 ===================
 
-Run the following script, supplying db, db_user, and db_password
+Run the following script, supplying **db**, **db_user**, and **db_password**
 
 ```
 sudo ansible-playbook -c local deploy.yml -e "db=zerobot_db db_user=zerobot db_password=password"
