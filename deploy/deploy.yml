@@ -6,23 +6,33 @@
 
   tasks:
   - name: Install PostgreSQL 9
-    action: yum name=postgresql9-server
-
-  - name: Remove existing pgsql9 data dir, need to re-run PostgreSQL init script
-    action: file path=$pgdata state=absent
+    action: yum name=${item}
+    with_items:
+      - postgresql9-server
+      - postgresql9-devel
+      - python-psycopg2
 
   - name: Initialise PostgreSQL 
     action: command service postgresql initdb
 
-  - name: Listen on remote addresses
+  - name: Allow remote TCP connection
     action: command sed -i.bak "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" $pgdata/postgresql.conf
 
-  - name: Allow remote TCP connection using username/password
-    action: sed -r -i.bak "s/host +all +all +127.0.0.1\/32 +ident/host all all 0.0.0.0\/0 md5/g" $pgdata/pg_hba.conf
+  - name: Allow remote user login with username/password
+    action: command sed -r -i.bak "s/^host +all +all +127.0.0.1\/32 +ident/host all all 0.0.0.0\/0 md5/g" $pgdata/pg_hba.conf
 
+  - name: Allow any local user to login (so we can create db and user)
+    action: command sed -r -i.bak "s/^local +all +all +peer/local all all trust/g" $pgdata/pg_hba.conf
 
+  - name: Start PostgreSQL service
+    action: service name=postgresql state=started
+
+  - name: Ensure PostgreSQL is started
+    action: command sleep 5
+
+  - name: Create database user
+    action: command psql -U postgres -c "CREATE ROLE ${db_user} WITH LOGIN PASSWORD '${db_password}';"
   
-  # action: sudo service postgresql start
-  # psql -c "CREATE ROLE dave WITH LOGIN PASSWORD 'password';"
-  # psql create database
+  - name: Create database
+    action: command psql -U postgres -c "CREATE DATABASE ${db} WITH OWNER = ${db_user}"
   
