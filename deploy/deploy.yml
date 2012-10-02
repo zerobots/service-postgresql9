@@ -16,7 +16,7 @@
       - python-psycopg2
 
   - name: Initialise PostgreSQL
-    action: command service postgresql initdb creates=/var/lib/pgsql9
+    action: command service postgresql initdb creates=$pgdata
 
   - name: Allow remote TCP connection
     action: command sed -i.bak "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" $pgdata/postgresql.conf
