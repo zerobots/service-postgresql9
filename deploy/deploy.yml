@@ -4,6 +4,9 @@
   vars:
     pgdata: /var/lib/pgsql9/data
 
+  vars_files:
+    - env.yaml
+
   tasks:
   - name: Install PostgreSQL 9
     action: yum name=${item}
@@ -12,7 +15,7 @@
       - postgresql9-devel
       - python-psycopg2
 
-  - name: Initialise PostgreSQL 
+  - name: Initialise PostgreSQL
     action: command service postgresql initdb
 
   - name: Allow remote TCP connection
@@ -31,8 +34,7 @@
     action: command sleep 5
 
   - name: Create database user
-    action: command psql -U postgres -c "CREATE ROLE ${db_user} WITH LOGIN PASSWORD '${db_password}';"
-  
+    action: command psql -U postgres -c "CREATE ROLE ${db_username} WITH LOGIN PASSWORD '${db_password}';"
+
   - name: Create database
-    action: command psql -U postgres -c "CREATE DATABASE ${db} WITH OWNER = ${db_user}"
-  
+    action: command psql -U postgres -c "CREATE DATABASE ${db_name} WITH OWNER = ${db_username}"
