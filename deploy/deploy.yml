@@ -15,11 +15,8 @@
       - postgresql9-devel
       - python-psycopg2
 
-  - name: Wait
-    action: command sleep 5
-
   - name: Initialise PostgreSQL
-    action: command service postgresql initdb creates=$pgdata/pg_hba.conf
+    action: command /sbin/service postgresql initdb creates=$pgdata/pg_hba.conf
 
   - name: Allow remote TCP connection
     action: command sed -i.bak "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/g" $pgdata/postgresql.conf
